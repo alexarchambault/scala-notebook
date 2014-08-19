@@ -17,7 +17,7 @@ object NotebookBuild extends Build {
   import Dependencies._
 
   override def settings = super.settings ++ Seq(
-    organization := "com.bwater",
+    organization := "com.github.alexarchambault.scala_notebook",
     version := "0.3.0-SNAPSHOT",
     scalaVersion in ThisBuild := "2.10.4",
     fork in Test in ThisBuild := true,
@@ -96,7 +96,7 @@ object NotebookBuild extends Build {
     .dependsOn(common, subprocess, observable)
     .projectDefaults
     .settings(
-      name := "notebook-kernel",
+      name := "kernel",
 
       libraryDependencies ++= Seq(
         akkaRemote,
@@ -118,7 +118,7 @@ object NotebookBuild extends Build {
     .projectDefaults
     .withWebAssets
     .settings(
-      name := "notebook-server",
+      name := "server",
 
       mainClass in (Compile, run) := Some("com.bwater.notebook.Server"),
 
