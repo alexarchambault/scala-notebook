@@ -133,31 +133,45 @@ object Server extends Logging {
 
     def resourcePlan(res: Resources*)(h: Http) = res.foldLeft(h)((h, r) => h.plan(r).makePlan(new ChunkedWriteHandler))
 
-    http
-      .handler(obsInt)
-      .handler(wsPlan)
-      .chunked(256 << 20)
-      .handler(loggerPlan)
+    val server =
+      http
+        .handler(obsInt)
+        .handler(wsPlan)
+        .chunked(256 << 20)
+        .handler(loggerPlan)
+      
+        .handler(authPlan)
+      
+        .handler(nbReadPlan)
+        .handler(nbWritePlan)
+        .handler(kernelPlan)
+        .handler(templatesPlan)
+      
+        /* Workaround for https://github.com/unfiltered/unfiltered/issues/139 */
+        .pipe(resourcePlan(iPythonRes, thirdPartyRes))
+        .pipe(resourcePlan(moduleRes: _*))
+        .pipe(resourcePlan(observableRes))
 
-      .handler(authPlan)
 
-      .handler(nbReadPlan)
-      .handler(nbWritePlan)
-      .handler(kernelPlan)
-      .handler(templatesPlan)
-
-      /* Workaround for https://github.com/unfiltered/unfiltered/issues/139 */
-      .pipe(resourcePlan(iPythonRes, thirdPartyRes))
-      .pipe(resourcePlan(moduleRes: _*))
-      .pipe(resourcePlan(observableRes))
-      .run({
-        svr =>
-          startAction(svr, app)
-      }, {
-        svr =>
-          logInfo("shutting down server")
-          KernelManager.shutdown()
-          app.system.shutdown()
-      })
+    /*
+     * For sbt-notebook
+     * The below is what server.run(...) would do if the current thread is not main,
+     * but we want it to do that even if the current thread is main, as scala-notebook
+     * is launched this way by sbt-notebook (that is in a forked JVM).
+     */
+    server.start()
+    startAction(server, app)
+    println("Embedded server running on port %d. Press any key to stop." format port)
+    def doWait() {
+      try { Thread.sleep(1000) } catch { case _: InterruptedException => () }
+      if(System.in.available() <= 0)
+        doWait()
+    }
+    doWait()
+    server.stop()
+    logInfo("shutting down server")
+    KernelManager.shutdown()
+    app.system.shutdown()
+    server.destroy()
   }
 }
