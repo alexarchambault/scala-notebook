@@ -32,14 +32,46 @@ object NotebookBuild extends Build {
   ),
 
     compileOrder := CompileOrder.Mixed,
-    publishMavenStyle := false,
+    publishMavenStyle := true,
+    pomExtra := {
+      <url>https://github.com/alexarchambault/scala-notebook</url>
+      <licenses>
+        <license>
+          <name>Modified BSD</name>
+          <url>http://opensource.org/licenses/BSD-3-Clause</url>
+        </license>
+      </licenses>
+      <scm>
+        <connection>scm:git:github.com/alexarchambault/scala-notebook.git</connection>
+        <developerConnection>scm:git:git@github.com:alexarchambault/scala-notebook.git</developerConnection>
+        <url>github.com/alexarchambault/scala-notebook.git</url>
+      </scm>
+      <developers>
+        <developer>
+          <id>alexarchambault</id>
+          <name>Alexandre Archambault</name>
+          <url>https://github.com/alexarchambault</url>
+        </developer>
+      </developers>
+    },
     javacOptions ++= Seq("-Xlint:deprecation", "-g"),
     scalacOptions += "-deprecation",
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-q", "-v") //Suppress test output unless there is a failure
   )
 
+  val commonSettings = Seq(
+    publishTo := {
+      val nexus = "https://oss.sonatype.org/"
+      if (isSnapshot.value)
+        Some("snapshots" at nexus + "content/repositories/snapshots")
+      else
+        Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+    }
+  )
+
   lazy val root = Project(id = "scala-notebook", base = file("."))
     .aggregate(subprocess, observable, common, kernel, server)
+    .settings(commonSettings: _*)
     .settings(
       publish := {}, // don't publish an empty jar for the root project
       publishLocal := {}
@@ -47,6 +79,7 @@ object NotebookBuild extends Build {
 
   lazy val subprocess = Project(id = "subprocess", base = file("subprocess"))
     .projectDefaults
+    .settings(commonSettings: _*)
     .settings(
       libraryDependencies ++= Seq(
         akkaRemote,
@@ -63,6 +96,7 @@ object NotebookBuild extends Build {
     .dependsOn(subprocess)
     .projectDefaults
     .withWebAssets
+    .settings(commonSettings: _*)
     .settings(
       libraryDependencies ++= Seq(
         akkaRemote,
@@ -80,8 +114,9 @@ object NotebookBuild extends Build {
   lazy val common = Project(id = "common", base = file("common"))
     .dependsOn(observable)
     .projectDefaults
+    .settings(commonSettings: _*)
     .settings(
-      name := "notebook-common",
+      name := "common",
 
       libraryDependencies ++= Seq(
         akka,
@@ -95,6 +130,7 @@ object NotebookBuild extends Build {
   lazy val kernel = Project(id = "kernel", base = file("kernel"))
     .dependsOn(common, subprocess, observable)
     .projectDefaults
+    .settings(commonSettings: _*)
     .settings(
       name := "kernel",
 
@@ -117,6 +153,7 @@ object NotebookBuild extends Build {
     .dependsOn(common, kernel)
     .projectDefaults
     .withWebAssets
+    .settings(commonSettings: _*)
     .settings(
       name := "server",
 
