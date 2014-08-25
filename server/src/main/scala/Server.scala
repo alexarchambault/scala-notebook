@@ -10,6 +10,7 @@ import server._
 import java.io.{ IOException, File, Reader }
 import java.net.{ InetAddress, URLEncoder }
 import com.typesafe.config.Config
+import com.bwater.notebook.kernel.ConfigUtils._
 import java.io.BufferedReader
 import com.typesafe.config.ConfigFactory
 import java.io.FileReader
@@ -72,8 +73,8 @@ object Server extends Logging {
     val secure = !args.contains("--disable_security")
 
     logInfo("Running SN Server in " + config.notebooksDir.getAbsolutePath)
-    val host = "127.0.0.1"
-    val port = choosePort(host)
+    val host = config.kernelVMConfig.get("hostname") getOrElse "127.0.0.1"
+    val port = config.kernelVMConfig.get("port").filter(_.forall(_.isDigit)).map(_.toInt) getOrElse choosePort(host)
     val security = if (secure) new ClientAuth(host, port) else Insecure
 
     val NotebookArg = "--notebook=(\\S+)".r
@@ -90,7 +91,7 @@ object Server extends Logging {
     }
   }
 
-  /* TODO: move host, port, security settings into config? */
+  /* TODO: move security settings into config? */
   def startServer(config: ScalaNotebookConfig, host: String, port: Int, security: DispatcherSecurity)(startAction: (Http, Dispatcher) => Unit) {
 
     if (!config.notebooksDir.exists()) {
