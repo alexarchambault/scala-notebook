@@ -39,7 +39,7 @@ object Server extends Logging {
 
   def main(args: Array[String]) {
     val action =  if(!args.contains("--no_browser")) {openBrowser _ } 
-                  else (s:String)=>logInfo(s"You can head to $s")
+                  else (s:String)=>println(s"You can head to $s")
 
     startServer(args, ScalaNotebookConfig.withOverrides(ScalaNotebookConfig.defaults))(action)
   }
