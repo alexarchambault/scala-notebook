@@ -31,7 +31,7 @@ class DropDown[A](options: Seq[A], toString: A=>String = (a:A)=>a.toString) exte
   lazy val toHtml =
     <select data-bind="options: options, optionsText: 'text', optionsValue: 'index', value: selectedIndex">{
       scopedScript(
-        "require(['observable', 'knockout'], function (O, ko) { ko.applyBindings({ options: O.makeObservableArray(optionsId), selectedIndex: O.makeObservable(selectedIndexId) }, this); });",
+        "define(['observable', 'knockout'], function (O, ko) { ko.applyBindings({ options: O.makeObservableArray(optionsId), selectedIndex: O.makeObservable(selectedIndexId) }, this); });",
         ("optionsId" -> _optionsConnection.id) ~ ("selectedIndexId" -> _selected.id)
       )
     }</select>
