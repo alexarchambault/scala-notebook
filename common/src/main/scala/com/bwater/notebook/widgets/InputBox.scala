@@ -20,7 +20,7 @@ class InputBox(initial: String) extends Widget {
 
   lazy val toHtml = <input data-bind="value: value">{
     scopedScript(
-      "require(['observable', 'knockout'], function (Observable, ko) { ko.applyBindings({ value: Observable.makeObservable(valueId) }, this); })",
+      "define(['observable', 'knockout'], function (Observable, ko) { ko.applyBindings({ value: Observable.makeObservable(valueId) }, this); })",
       ("valueId" -> connection.id)
     )
     }</input>

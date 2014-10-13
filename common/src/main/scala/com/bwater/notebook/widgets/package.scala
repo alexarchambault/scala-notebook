@@ -39,7 +39,7 @@ package object widgets {
 
     html(<p data-bind="text: value, style: style">{
       scopedScript(
-        "require(['observable', 'knockout'], function (O, ko) { ko.applyBindings({ value: O.makeObservable(valueId), style: O.makeObservable(styleId) }, this); });",
+        "define(['observable', 'knockout'], function (O, ko) { ko.applyBindings({ value: O.makeObservable(valueId), style: O.makeObservable(styleId) }, this); });",
         ("valueId" -> _currentValue.id) ~ ("styleId" -> _currentStyle.id)
       )}</p>)
   }
