@@ -110,11 +110,6 @@ object NotebookBuild extends Build {
       libraryDependencies ++= Seq(
         "org.scala-lang" % "jline" % scalaVersion.value,
         "org.scala-lang" % "scala-compiler" % scalaVersion.value
-      ),
-
-      libraryDependencies ++= Seq(
-        sparkRepl,
-        sparkSQL
       )
     )
 
@@ -140,26 +135,14 @@ object NotebookBuild extends Build {
         scalaTest,
         scalaMock,
         "org.fusesource.scalate" %% "scalate-core" % "1.6.1"
-      ),
-
-      libraryDependencies ++= Seq(
-        sparkRepl,
-        sparkSQL
-      ),
-
-      libraryDependencies ++= Seq(
-        aetherApi,
-        jcabiAether,
-        mavenCore
       )
     )
 
   object Dependencies {
     val unfilteredVersion    = "0.6.7"
-    val akkaVersion          = "2.2.3-shaded-protobuf"
+    val akkaOrganization     = "com.typesafe.akka"
+    val akkaVersion          = "2.2.4"
 
-    val sparkRepl            = "org.apache.spark"          %%         "spark-repl"          %      "1.1.0"
-    val sparkSQL             = "org.apache.spark"          %%         "spark-sql"           %      "1.1.0"
     val commonsIO            = "org.apache.commons"        %          "commons-io"          %      "1.3.2"
     val commonsHttp          = "org.apache.httpcomponents" %          "httpclient"          %      "4.3.4"
     val slf4jLog4j           = "org.slf4j"                 %         "slf4j-log4j12"        %      "1.7.7"
@@ -167,17 +150,12 @@ object NotebookBuild extends Build {
     val unfilteredFilter     = "net.databinder"            %%      "unfiltered-filter"      % unfilteredVersion
     val unfilteredWebsockets = "net.databinder"            %% "unfiltered-netty-websockets" % unfilteredVersion
     val unfilteredJson       = "net.databinder"            %%       "unfiltered-json"       % unfilteredVersion
-    val akka                 = "org.spark-project.akka"    %%         "akka-actor"          %    akkaVersion
-    val akkaRemote           = "org.spark-project.akka"    %%         "akka-remote"         %    akkaVersion
-    val akkaSlf4j            = "org.spark-project.akka"    %%          "akka-slf4j"         %    akkaVersion
-    val akkaTestkit          = "org.spark-project.akka"    %%         "akka-testkit"        %    akkaVersion    % "test"
+    val akka                 = akkaOrganization            %%         "akka-actor"          %    akkaVersion
+    val akkaRemote           = akkaOrganization            %%         "akka-remote"         %    akkaVersion
+    val akkaSlf4j            = akkaOrganization            %%          "akka-slf4j"         %    akkaVersion
+    val akkaTestkit          = akkaOrganization            %%         "akka-testkit"        %    akkaVersion    % "test"
     val scalaTest            = "org.scalatest"             %%          "scalatest"          %      "2.2.0"      % "test"
     val scalaMock            = "org.scalamock"             %% "scalamock-scalatest-support" %     "3.1.RC1"     % "test"
-
-    // to download deps at runtime
-    val aetherApi            = "org.sonatype.aether"       %          "aether-api"          %     "1.13.1"
-    val jcabiAether          = "com.jcabi"                 %         "jcabi-aether"         %      "0.10"
-    val mavenCore            = "org.apache.maven"          %          "maven-core"          %     "3.0.5"
   }
 
 

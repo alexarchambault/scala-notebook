@@ -55,11 +55,6 @@ class CalcWebSocketService(system: ActorSystem, initScripts: List[String], compi
         for (op <- currentSessionOperation) {
           calculator.tell(InterruptRequest, op)
         }
-
-      case SparkClassServerUri => {
-        calculator forward SparkClassServerUri
-      }
-
       case req@SessionRequest(header, session, request) =>
         val operations = new SessionOperationActors(header, session)
         val operationActor = (request: @unchecked) match {
